@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceFlow Pro — Gestão Financeira</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #f0f2f7;
+  --surface: #ffffff;
+  --surface2: #f5f7fb;
+  --surface3: #eaecf4;
+  --border: #dde1ee;
+  --border2: #c8cde0;
+  --accent: #1a6fd4;
+  --accent2: #1558b0;
+  --green: #16a34a;
+  --red: #dc2626;
+  --amber: #d97706;
+  --text: #1a1f36;
+  --text2: #3d4466;
+  --text3: #6b7299;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --r: 10px;
+  --r2: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+#sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width 0.3s;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1.2;
+}
+.sidebar-logo span { color: var(--accent); }
+.sidebar-logo p { font-size: 11px; color: var(--text3); margin-top: 3px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.nav-section { padding: 12px 0 4px; }
+.nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); padding: 0 20px 6px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { color: var(--text); background: var(--surface2); }
+.nav-item.active { color: var(--accent); background: rgba(26,111,212,0.08); border-left-color: var(--accent); }
+.nav-item .ico { font-size: 16px; width: 20px; text-align: center; }
+
+/* MAIN */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#topbar {
+  height: 58px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+#topbar h2 { font-family: var(--serif); font-size: 20px; flex: 1; }
+#topbar .month-nav { display: flex; align-items: center; gap: 8px; }
+#topbar .month-nav button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 30px; height: 30px;
+  border-radius: var(--r2);
+  cursor: pointer; font-size: 14px;
+  transition: all 0.15s;
+}
+#topbar .month-nav button:hover { background: var(--surface3); border-color: var(--border2); }
+#topbar .month-nav span { font-size: 14px; font-weight: 600; color: var(--text); min-width: 130px; text-align: center; }
+
+#content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+/* CARDS */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.summary-card.c-blue::before { background: var(--accent); }
+.summary-card.c-green::before { background: var(--green); }
+.summary-card.c-red::before { background: var(--red); }
+.summary-card.c-amber::before { background: var(--amber); }
+.summary-card .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 8px; }
+.summary-card .value { font-size: 24px; font-weight: 700; font-family: var(--serif); }
+.summary-card .value.pos { color: var(--green); }
+.summary-card .value.neg { color: var(--red); }
+.summary-card .value.neu { color: var(--text); }
+.summary-card .value.acc { color: var(--accent); }
+.summary-card .sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* TABLE */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.table-toolbar h3 { font-size: 15px; font-weight: 600; flex: 1; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px;
+  border-radius: var(--r2);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  font-family: var(--sans);
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+.btn-green { background: rgba(22,163,74,0.10); color: var(--green); border: 1px solid rgba(22,163,74,0.25); }
+.btn-green:hover { background: rgba(22,163,74,0.20); }
+.btn-red { background: rgba(220,38,38,0.08); color: var(--red); border: 1px solid rgba(220,38,38,0.20); }
+.btn-red:hover { background: rgba(220,38,38,0.16); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--surface2); }
+th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 14px;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  color: var(--text2);
+}
+tr:hover td { background: rgba(255,255,255,0.02); }
+td.td-date { color: var(--text3); font-size: 12px; }
+td.td-desc { color: var(--text); font-weight: 500; }
+td.td-pos { color: var(--green); font-weight: 600; }
+td.td-neg { color: var(--red); font-weight: 600; }
+td.td-saldo { color: var(--accent); font-weight: 700; }
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-blue { background: rgba(26,111,212,0.10); color: var(--accent); }
+.badge-green { background: rgba(22,163,74,0.10); color: var(--green); }
+.badge-red { background: rgba(220,38,38,0.10); color: var(--red); }
+.badge-amber { background: rgba(217,119,6,0.10); color: var(--amber); }
+.badge-gray { background: rgba(107,114,153,0.10); color: var(--text3); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  width: 560px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.2s ease;
+}
+.modal.modal-lg { width: 780px; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header {
+  display: flex; align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-family: var(--serif); font-size: 18px; flex: 1; }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; transition: color 0.15s; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-full { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
+.form-group input, .form-group select, .form-group textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  color: var(--text);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: var(--sans);
+  transition: border-color 0.15s;
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--accent);
+  background: var(--surface3);
+}
+.form-group select option { background: var(--surface2); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* CADASTRO */
+.cadastro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.cadastro-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.cadastro-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.cadastro-card-header .ico-big { font-size: 20px; }
+.cadastro-card-header h4 { font-size: 14px; font-weight: 600; flex: 1; }
+.cadastro-list { max-height: 200px; overflow-y: auto; }
+.cadastro-list-item {
+  display: flex; align-items: center;
+  padding: 9px 18px;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  color: var(--text2);
+  gap: 8px;
+}
+.cadastro-list-item:first-child { border-top: none; }
+.cadastro-list-item span { flex: 1; }
+.cadastro-list-item .del-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 14px; padding: 2px 5px;
+  border-radius: 4px; transition: all 0.15s;
+  font-family: var(--sans);
+}
+.cadastro-list-item .del-btn:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+.cadastro-empty { padding: 20px 18px; font-size: 13px; color: var(--text3); text-align: center; }
+.cadastro-add-form {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; gap: 8px;
+}
+.cadastro-add-form input {
+  flex: 1;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: var(--r2);
+  font-size: 13px;
+  font-family: var(--sans);
+  outline: none;
+}
+.cadastro-add-form input:focus { border-color: var(--accent); }
+
+/* REPORTS */
+.report-section { margin-bottom: 28px; }
+.report-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+
+.report-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.report-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.report-btn:hover { border-color: var(--accent); background: rgba(26,111,212,0.05); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,111,212,0.10); }
+.report-btn .r-ico { font-size: 24px; }
+.report-btn .r-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.report-btn .r-desc { font-size: 12px; color: var(--text3); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* SEARCH */
+.search-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  color: var(--text);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  outline: none;
+  width: 200px;
+}
+.search-input:focus { border-color: var(--accent); }
+
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: #ffffff;
+  border: 1px solid var(--border2);
+  border-left: 4px solid var(--green);
+  padding: 12px 20px;
+  border-radius: var(--r2);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  z-index: 9999;
+  display: none;
+  animation: slideUp 0.2s ease;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text3);
+}
+.empty-state .e-ico { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* responsive tweaks */
+@media (max-width: 1100px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .cadastro-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h1>Finance<span>Flow</span></h1>
+    <p>Gestão Financeira Pro</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" onclick="showView('dashboard')">
+      <span class="ico">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showView('lancamentos')">
+      <span class="ico">💳</span> Lançamentos
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Cadastros</div>
+    <div class="nav-item" onclick="showView('cadastros')">
+      <span class="ico">🏦</span> Contas Bancárias
+    </div>
+    <div class="nav-item" onclick="showView('cadastros')">
+      <span class="ico">🏢</span> Empresas
+    </div>
+    <div class="nav-item" onclick="showView('cadastros')">
+      <span class="ico">🏷️</span> Tipo de Custo
+    </div>
+    <div class="nav-item" onclick="showView('cadastros')">
+      <span class="ico">📁</span> Centro de Custo
+    </div>
+    <div class="nav-item" onclick="showView('cadastros')">
+      <span class="ico">🔄</span> Tipo de Movimentação
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Relatórios</div>
+    <div class="nav-item" onclick="showView('relatorios')">
+      <span class="ico">📄</span> Relatórios PDF
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <h2 id="topbar-title">Dashboard</h2>
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <span id="current-month-label"></span>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" class="view active">
+      <div class="summary-grid">
+        <div class="summary-card c-green">
+          <div class="label">Entradas do Mês</div>
+          <div class="value pos" id="sum-entradas">R$ 0,00</div>
+          <div class="sub" id="sum-entradas-count">0 lançamentos</div>
+        </div>
+        <div class="summary-card c-red">
+          <div class="label">Saídas do Mês</div>
+          <div class="value neg" id="sum-saidas">R$ 0,00</div>
+          <div class="sub" id="sum-saidas-count">0 lançamentos</div>
+        </div>
+        <div class="summary-card c-blue">
+          <div class="label">Saldo do Mês</div>
+          <div class="value" id="sum-saldo" style="color:var(--accent)">R$ 0,00</div>
+          <div class="sub">Resultado do período</div>
+        </div>
+        <div class="summary-card c-amber">
+          <div class="label">Total de Lançamentos</div>
+          <div class="value" style="color:var(--amber)" id="sum-total">0</div>
+          <div class="sub">No período atual</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3>Lançamentos Recentes</h3>
+          <button class="btn btn-primary" onclick="openModalLancamento()">＋ Novo Lançamento</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Descrição</th>
+              <th>Empresa</th>
+              <th>Centro de Custo</th>
+              <th>Tipo Custo</th>
+              <th>Tipo Mov.</th>
+              <th>Conta</th>
+              <th>Entrada</th>
+              <th>Saída</th>
+              <th>Saldo Parcial</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LANÇAMENTOS -->
+    <div id="view-lancamentos" class="view">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3>Todos os Lançamentos</h3>
+          <input class="search-input" placeholder="🔍 Buscar..." oninput="filterLancamentos(this.value)" id="search-lanc">
+          <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
+          <button class="btn btn-primary" onclick="openModalLancamento()">＋ Novo Lançamento</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Descrição</th>
+              <th>Empresa</th>
+              <th>Centro de Custo</th>
+              <th>Tipo Custo</th>
+              <th>Tipo Mov.</th>
+              <th>Conta</th>
+              <th>Entrada</th>
+              <th>Saída</th>
+              <th>Saldo Parcial</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="lancamentos-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CADASTROS -->
+    <div id="view-cadastros" class="view">
+      <div class="cadastro-grid">
+
+        <div class="cadastro-card">
+          <div class="cadastro-card-header">
+            <span class="ico-big">🏦</span>
+            <h4>Contas Bancárias</h4>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal('contas')">＋</button>
+          </div>
+          <div class="cadastro-list" id="list-contas"></div>
+        </div>
+
+        <div class="cadastro-card">
+          <div class="cadastro-card-header">
+            <span class="ico-big">🏢</span>
+            <h4>Empresas</h4>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal('empresas')">＋</button>
+          </div>
+          <div class="cadastro-list" id="list-empresas"></div>
+        </div>
+
+        <div class="cadastro-card">
+          <div class="cadastro-card-header">
+            <span class="ico-big">🏷️</span>
+            <h4>Tipos de Custo</h4>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal('tipoCusto')">＋</button>
+          </div>
+          <div class="cadastro-list" id="list-tipoCusto"></div>
+        </div>
+
+        <div class="cadastro-card">
+          <div class="cadastro-card-header">
+            <span class="ico-big">📁</span>
+            <h4>Centros de Custo</h4>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal('centroCusto')">＋</button>
+          </div>
+          <div class="cadastro-list" id="list-centroCusto"></div>
+        </div>
+
+        <div class="cadastro-card">
+          <div class="cadastro-card-header">
+            <span class="ico-big">🔄</span>
+            <h4>Tipos de Movimentação</h4>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal('tipoMov')">＋</button>
+          </div>
+          <div class="cadastro-list" id="list-tipoMov"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RELATÓRIOS -->
+    <div id="view-relatorios" class="view">
+      <div class="report-section">
+        <h3>📄 Relatório Mensal Completo</h3>
+        <div class="report-buttons" style="grid-template-columns:1fr;">
+          <div class="report-btn" onclick="gerarRelatorioPDF('mensal')">
+            <span class="r-ico">📋</span>
+            <span class="r-title">Relatório Mensal Completo</span>
+            <span class="r-desc">Todos os lançamentos do mês com resumo de entradas, saídas e saldo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h3>📊 Relatórios Analíticos</h3>
+        <div class="report-buttons">
+          <div class="report-btn" onclick="gerarRelatorioPDF('empresa')">
+            <span class="r-ico">🏢</span>
+            <span class="r-title">Por Empresa</span>
+            <span class="r-desc">Movimentações agrupadas por empresa</span>
+          </div>
+          <div class="report-btn" onclick="gerarRelatorioPDF('centroCusto')">
+            <span class="r-ico">📁</span>
+            <span class="r-title">Por Centro de Custo</span>
+            <span class="r-desc">Movimentações agrupadas por centro de custo</span>
+          </div>
+          <div class="report-btn" onclick="gerarRelatorioPDF('tipoCusto')">
+            <span class="r-ico">🏷️</span>
+            <span class="r-title">Por Tipo de Custo</span>
+            <span class="r-desc">Movimentações agrupadas por tipo de custo</span>
+          </div>
+          <div class="report-btn" onclick="gerarRelatorioPDF('conta')">
+            <span class="r-ico">🏦</span>
+            <span class="r-title">Por Conta Bancária</span>
+            <span class="r-desc">Movimentações agrupadas por conta bancária</span>
+          </div>
+          <div class="report-btn" onclick="gerarRelatorioPDF('tipoMov')">
+            <span class="r-ico">🔄</span>
+            <span class="r-title">Por Tipo de Movimentação</span>
+            <span class="r-desc">Movimentações agrupadas por tipo de movimentação</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODAL LANÇAMENTO -->
+<div class="modal-overlay" id="modal-lancamento">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="modal-lanc-title">Novo Lançamento</h3>
+      <button class="modal-close" onclick="closeModal('modal-lancamento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid cols3">
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" id="f-data">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Movimentação *</label>
+          <select id="f-tipoMov"></select>
+        </div>
+        <div class="form-group">
+          <label>Empresa *</label>
+          <select id="f-empresa"></select>
+        </div>
+        <div class="form-group form-full">
+          <label>Descrição *</label>
+          <input type="text" id="f-descricao" placeholder="Descreva a movimentação...">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Custo</label>
+          <select id="f-tipoCusto"></select>
+        </div>
+        <div class="form-group">
+          <label>Centro de Custo</label>
+          <select id="f-centroCusto"></select>
+        </div>
+        <div class="form-group">
+          <label>Conta Bancária *</label>
+          <select id="f-conta"></select>
+        </div>
+        <div class="form-group">
+          <label>Entrada (R$)</label>
+          <input type="number" id="f-entrada" placeholder="0,00" step="0.01" min="0" oninput="calcSaldo()">
+        </div>
+        <div class="form-group">
+          <label>Saída (R$)</label>
+          <input type="number" id="f-saida" placeholder="0,00" step="0.01" min="0" oninput="calcSaldo()">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lancamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLancamento()">💾 Salvar Lançamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD CADASTRO -->
+<div class="modal-overlay" id="modal-add-cad">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <h3 id="modal-add-title">Adicionar</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-cad')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label id="add-field-label">Nome</label>
+        <input type="text" id="add-field-input" placeholder="Digite o nome...">
+      </div>
+      <div id="add-extra-fields"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-cad')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewCadastro()">💾 Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ===================== STATE =====================
+let currentCadastroType = '';
+let editingId = null;
+let currentDate = new Date();
+
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let db = {
+  contas: ['Banco do Brasil - CC 001','Caixa Econômica - CC 002','Bradesco - CC 003'],
+  empresas: ['Empresa Alpha LTDA','Empresa Beta S.A.','Empresa Gamma ME'],
+  tipoCusto: ['Custo Fixo','Custo Variável','Custo Operacional','Investimento'],
+  centroCusto: ['Administrativo','Comercial','Produção','TI','Marketing'],
+  tipoMov: ['Pagamento','Recebimento','Transferência','Reembolso','Provisão'],
+  lancamentos: []
+};
+
+// Load from localStorage
+function loadDB() {
+  const saved = localStorage.getItem('financeflow_db');
+  if (saved) {
+    try { db = JSON.parse(saved); } catch(e) {}
+  }
+  // seed sample data
+  if (db.lancamentos.length === 0) {
+    const now = new Date();
+    const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+    const sampleData = [
+      { id: genId(), data: `${y}-${m}-02`, descricao: 'Recebimento de Cliente Alpha', empresa: 'Empresa Alpha LTDA', tipoCusto: 'Custo Variável', centroCusto: 'Comercial', tipoMov: 'Recebimento', conta: 'Banco do Brasil - CC 001', entrada: 15000, saida: 0 },
+      { id: genId(), data: `${y}-${m}-05`, descricao: 'Pagamento Fornecedor TI', empresa: 'Empresa Alpha LTDA', tipoCusto: 'Custo Fixo', centroCusto: 'TI', tipoMov: 'Pagamento', conta: 'Bradesco - CC 003', entrada: 0, saida: 3200 },
+      { id: genId(), data: `${y}-${m}-08`, descricao: 'Recebimento Beta Corp', empresa: 'Empresa Beta S.A.', tipoCusto: 'Custo Variável', centroCusto: 'Comercial', tipoMov: 'Recebimento', conta: 'Caixa Econômica - CC 002', entrada: 8500, saida: 0 },
+      { id: genId(), data: `${y}-${m}-10`, descricao: 'Folha de Pagamento', empresa: 'Empresa Alpha LTDA', tipoCusto: 'Custo Fixo', centroCusto: 'Administrativo', tipoMov: 'Pagamento', conta: 'Banco do Brasil - CC 001', entrada: 0, saida: 12000 },
+      { id: genId(), data: `${y}-${m}-15`, descricao: 'Campanha Marketing Digital', empresa: 'Empresa Gamma ME', tipoCusto: 'Investimento', centroCusto: 'Marketing', tipoMov: 'Pagamento', conta: 'Bradesco - CC 003', entrada: 0, saida: 4500 },
+    ];
+    db.lancamentos = sampleData;
+    saveDB();
+  }
+}
+
+function saveDB() { localStorage.setItem('financeflow_db', JSON.stringify(db)); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+
+// ===================== NAV =====================
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  
+  const titles = { dashboard:'Dashboard', lancamentos:'Lançamentos', cadastros:'Cadastros', relatorios:'Relatórios PDF' };
+  document.getElementById('topbar-title').textContent = titles[v] || v;
+  
+  if (v === 'dashboard') renderDashboard();
+  if (v === 'lancamentos') renderLancamentos();
+  if (v === 'cadastros') renderCadastros();
+}
+
+// ===================== MONTH NAV =====================
+function changeMonth(d) {
+  currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + d, 1);
+  updateMonthLabel();
+  const active = document.querySelector('.view.active');
+  if (active?.id === 'view-dashboard') renderDashboard();
+  if (active?.id === 'view-lancamentos') renderLancamentos();
+}
+
+function updateMonthLabel() {
+  document.getElementById('current-month-label').textContent =
+    MONTHS[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+}
+
+function getFilteredLancamentos() {
+  const y = currentDate.getFullYear(), m = currentDate.getMonth();
+  return db.lancamentos.filter(l => {
+    const d = new Date(l.data + 'T12:00:00');
+    return d.getFullYear() === y && d.getMonth() === m;
+  }).sort((a,b) => a.data.localeCompare(b.data));
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  const items = getFilteredLancamentos();
+  let entradas = 0, saidas = 0, saldoParcial = 0;
+  
+  items.forEach(l => { entradas += Number(l.entrada)||0; saidas += Number(l.saida)||0; });
+  
+  document.getElementById('sum-entradas').textContent = fmt(entradas);
+  document.getElementById('sum-saidas').textContent = fmt(saidas);
+  const saldo = entradas - saidas;
+  const selEl = document.getElementById('sum-saldo');
+  selEl.textContent = fmt(saldo);
+  selEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('sum-total').textContent = items.length;
+  document.getElementById('sum-entradas-count').textContent = items.filter(l=>l.entrada>0).length + ' lançamentos';
+  document.getElementById('sum-saidas-count').textContent = items.filter(l=>l.saida>0).length + ' lançamentos';
+  
+  const tbody = document.getElementById('dashboard-tbody');
+  renderTableBody(tbody, items.slice(-10).reverse(), false);
+}
+
+// ===================== LANCAMENTOS =====================
+function renderLancamentos(filter='') {
+  const items = getFilteredLancamentos().filter(l =>
+    !filter ||
+    l.descricao?.toLowerCase().includes(filter) ||
+    l.empresa?.toLowerCase().includes(filter) ||
+    l.conta?.toLowerCase().includes(filter)
+  );
+  const tbody = document.getElementById('lancamentos-tbody');
+  renderTableBody(tbody, items, true);
+}
+
+function filterLancamentos(v) { renderLancamentos(v.toLowerCase()); }
+
+function renderTableBody(tbody, items, showActions) {
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text3)">Nenhum lançamento encontrado no período.</td></tr>`;
+    return;
+  }
+  let saldoAcc = 0;
+  const rows = items.map(l => {
+    const entrada = Number(l.entrada)||0;
+    const saida = Number(l.saida)||0;
+    saldoAcc += entrada - saida;
+    const saldoCls = saldoAcc >= 0 ? 'td-pos' : 'td-neg';
+    const actions = showActions ? `
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="editLancamento('${l.id}')">✏️</button>
+        <button class="btn btn-red btn-sm" style="margin-left:4px" onclick="deleteLancamento('${l.id}')">🗑️</button>
+      </td>` : '<td></td>';
+    return `<tr>
+      <td class="td-date">${formatDate(l.data)}</td>
+      <td class="td-desc">${l.descricao||'-'}</td>
+      <td><span class="badge badge-blue">${l.empresa||'-'}</span></td>
+      <td><span class="badge badge-gray">${l.centroCusto||'-'}</span></td>
+      <td><span class="badge badge-amber">${l.tipoCusto||'-'}</span></td>
+      <td><span class="badge badge-green">${l.tipoMov||'-'}</span></td>
+      <td style="font-size:12px;color:var(--text3)">${l.conta||'-'}</td>
+      <td class="td-pos">${entrada>0?fmt(entrada):'-'}</td>
+      <td class="td-neg">${saida>0?fmt(saida):'-'}</td>
+      <td class="${saldoCls}">${fmt(saldoAcc)}</td>
+      ${actions}
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+}
+
+// ===================== MODAL LANCAMENTO =====================
+function openModalLancamento(id=null) {
+  editingId = id;
+  const modal = document.getElementById('modal-lancamento');
+  document.getElementById('modal-lanc-title').textContent = id ? 'Editar Lançamento' : 'Novo Lançamento';
+  
+  // populate selects
+  populateSelect('f-tipoMov', db.tipoMov);
+  populateSelect('f-empresa', db.empresas);
+  populateSelect('f-tipoCusto', db.tipoCusto);
+  populateSelect('f-centroCusto', db.centroCusto);
+  populateSelect('f-conta', db.contas);
+  
+  if (id) {
+    const l = db.lancamentos.find(x => x.id === id);
+    if (l) {
+      document.getElementById('f-data').value = l.data;
+      document.getElementById('f-descricao').value = l.descricao;
+      document.getElementById('f-empresa').value = l.empresa;
+      document.getElementById('f-tipoCusto').value = l.tipoCusto;
+      document.getElementById('f-centroCusto').value = l.centroCusto;
+      document.getElementById('f-tipoMov').value = l.tipoMov;
+      document.getElementById('f-conta').value = l.conta;
+      document.getElementById('f-entrada').value = l.entrada || '';
+      document.getElementById('f-saida').value = l.saida || '';
+    }
+  } else {
+    document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+    document.getElementById('f-descricao').value = '';
+    document.getElementById('f-entrada').value = '';
+    document.getElementById('f-saida').value = '';
+  }
+  modal.classList.add('open');
+}
+
+function calcSaldo() {} // placeholder for live calc
+
+function saveLancamento() {
+  const data = document.getElementById('f-data').value;
+  const descricao = document.getElementById('f-descricao').value.trim();
+  const empresa = document.getElementById('f-empresa').value;
+  const tipoCusto = document.getElementById('f-tipoCusto').value;
+  const centroCusto = document.getElementById('f-centroCusto').value;
+  const tipoMov = document.getElementById('f-tipoMov').value;
+  const conta = document.getElementById('f-conta').value;
+  const entrada = parseFloat(document.getElementById('f-entrada').value)||0;
+  const saida = parseFloat(document.getElementById('f-saida').value)||0;
+  
+  if (!data || !descricao || !empresa || !conta || !tipoMov) {
+    showToast('⚠️ Preencha os campos obrigatórios!', '#f59e0b'); return;
+  }
+  
+  if (editingId) {
+    const idx = db.lancamentos.findIndex(x => x.id === editingId);
+    if (idx !== -1) db.lancamentos[idx] = { ...db.lancamentos[idx], data, descricao, empresa, tipoCusto, centroCusto, tipoMov, conta, entrada, saida };
+    showToast('✅ Lançamento atualizado!');
+  } else {
+    db.lancamentos.push({ id: genId(), data, descricao, empresa, tipoCusto, centroCusto, tipoMov, conta, entrada, saida });
+    showToast('✅ Lançamento salvo com sucesso!');
+  }
+  
+  saveDB();
+  closeModal('modal-lancamento');
+  renderDashboard();
+  if (document.getElementById('view-lancamentos').classList.contains('active')) renderLancamentos();
+}
+
+function editLancamento(id) { openModalLancamento(id); }
+
+function deleteLancamento(id) {
+  if (!confirm('Deseja excluir este lançamento?')) return;
+  db.lancamentos = db.lancamentos.filter(x => x.id !== id);
+  saveDB();
+  renderLancamentos();
+  renderDashboard();
+  showToast('🗑️ Lançamento excluído.');
+}
+
+// ===================== CADASTROS =====================
+function renderCadastros() {
+  renderCadList('contas', db.contas);
+  renderCadList('empresas', db.empresas);
+  renderCadList('tipoCusto', db.tipoCusto);
+  renderCadList('centroCusto', db.centroCusto);
+  renderCadList('tipoMov', db.tipoMov);
+}
+
+function renderCadList(type, items) {
+  const el = document.getElementById('list-' + type);
+  if (!items || items.length === 0) {
+    el.innerHTML = '<div class="cadastro-empty">Nenhum cadastro ainda.</div>';
+    return;
+  }
+  el.innerHTML = items.map((item, i) => `
+    <div class="cadastro-list-item">
+      <span>${item}</span>
+      <button class="del-btn" onclick="deleteCadastro('${type}', ${i})">✕</button>
+    </div>`).join('');
+}
+
+function deleteCadastro(type, idx) {
+  if (!confirm('Remover este item?')) return;
+  db[type].splice(idx, 1);
+  saveDB();
+  renderCadastros();
+  showToast('🗑️ Item removido.');
+}
+
+let addTarget = '';
+function openAddModal(type) {
+  addTarget = type;
+  const labels = { contas:'Conta Bancária', empresas:'Empresa', tipoCusto:'Tipo de Custo', centroCusto:'Centro de Custo', tipoMov:'Tipo de Movimentação' };
+  document.getElementById('modal-add-title').textContent = 'Adicionar ' + (labels[type]||type);
+  document.getElementById('add-field-label').textContent = labels[type] || 'Nome';
+  document.getElementById('add-field-input').value = '';
+  document.getElementById('modal-add-cad').classList.add('open');
+  setTimeout(() => document.getElementById('add-field-input').focus(), 100);
+}
+
+function saveNewCadastro() {
+  const val = document.getElementById('add-field-input').value.trim();
+  if (!val) { showToast('⚠️ Digite um nome!', '#f59e0b'); return; }
+  if (db[addTarget].includes(val)) { showToast('⚠️ Item já existe!', '#f59e0b'); return; }
+  db[addTarget].push(val);
+  saveDB();
+  renderCadastros();
+  closeModal('modal-add-cad');
+  showToast('✅ Adicionado com sucesso!');
+}
+
+// ===================== HELPERS =====================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  editingId = null;
+}
+
+function populateSelect(id, options) {
+  const el = document.getElementById(id);
+  el.innerHTML = '<option value="">— Selecione —</option>' +
+    options.map(o => `<option value="${o}">${o}</option>`).join('');
+}
+
+function fmt(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatDate(d) {
+  if (!d) return '-';
+  const parts = d.split('-');
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function showToast(msg, color='#22c55e') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  t.style.borderLeftColor = color;
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+// ===================== CSV EXPORT =====================
+function exportCSV() {
+  const items = getFilteredLancamentos();
+  const header = ['Data','Descrição','Empresa','Centro de Custo','Tipo de Custo','Tipo Mov.','Conta','Entrada','Saída','Saldo Parcial'];
+  let saldo = 0;
+  const rows = items.map(l => {
+    saldo += (Number(l.entrada)||0) - (Number(l.saida)||0);
+    return [formatDate(l.data), l.descricao, l.empresa, l.centroCusto, l.tipoCusto, l.tipoMov, l.conta, l.entrada||0, l.saida||0, saldo.toFixed(2)];
+  });
+  const csv = [header, ...rows].map(r => r.map(c => `"${c}"`).join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `lancamentos_${MONTHS[currentDate.getMonth()]}_${currentDate.getFullYear()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️ CSV exportado!');
+}
+
+// ===================== PDF REPORTS =====================
+function gerarRelatorioPDF(tipo) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  
+  const items = getFilteredLancamentos();
+  const mes = MONTHS[currentDate.getMonth()] + ' / ' + currentDate.getFullYear();
+  const tipos = {
+    mensal: 'Relatório Mensal Completo',
+    empresa: 'Relatório por Empresa',
+    centroCusto: 'Relatório por Centro de Custo',
+    tipoCusto: 'Relatório por Tipo de Custo',
+    conta: 'Relatório por Conta Bancária',
+    tipoMov: 'Relatório por Tipo de Movimentação'
+  };
+  
+  // Header
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, 297, 297, 'F');
+  
+  doc.setFillColor(240, 242, 247);
+  doc.rect(0, 0, 297, 38, 'F');
+  
+  doc.setFillColor(26, 111, 212);
+  doc.rect(0, 0, 4, 38, 'F');
+  
+  doc.setTextColor(26, 31, 54);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text('FinanceFlow Pro', 12, 15);
+  
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(107, 114, 153);
+  doc.text(tipos[tipo] || 'Relatório', 12, 24);
+  doc.text('Período: ' + mes, 12, 31);
+  
+  // Stats top-right
+  let totalEnt = 0, totalSai = 0;
+  items.forEach(l => { totalEnt += Number(l.entrada)||0; totalSai += Number(l.saida)||0; });
+  const saldoTotal = totalEnt - totalSai;
+  
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 153);
+  doc.text('Entradas:', 200, 12);
+  doc.text('Saídas:', 200, 19);
+  doc.text('Saldo:', 200, 26);
+  doc.text('Lançamentos:', 200, 33);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(22, 163, 74);
+  doc.text(fmt(totalEnt), 225, 12);
+  doc.setTextColor(220, 38, 38);
+  doc.text(fmt(totalSai), 225, 19);
+  doc.setTextColor(saldoTotal >= 0 ? 22 : 220, saldoTotal >= 0 ? 163 : 38, saldoTotal >= 0 ? 74 : 38);
+  doc.text(fmt(saldoTotal), 225, 26);
+  doc.setTextColor(26, 111, 212);
+  doc.text(String(items.length), 225, 33);
+  
+  let y = 48;
+  
+  if (tipo === 'mensal') {
+    pdfTableAll(doc, items, y);
+  } else {
+    const groupKey = { empresa:'empresa', centroCusto:'centroCusto', tipoCusto:'tipoCusto', conta:'conta', tipoMov:'tipoMov' }[tipo];
+    const groups = {};
+    items.forEach(l => {
+      const k = l[groupKey] || 'Não informado';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(l);
+    });
+    
+    let firstGroup = true;
+    for (const [group, gitems] of Object.entries(groups)) {
+      if (!firstGroup) doc.addPage();
+      firstGroup = false;
+      
+      // group header
+      doc.setFillColor(240, 242, 247);
+      doc.rect(0, y - 6, 297, 14, 'F');
+      doc.setFillColor(26, 111, 212);
+      doc.rect(0, y - 6, 3, 14, 'F');
+      doc.setTextColor(26, 31, 54);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(group, 8, y + 2);
+      
+      let gEnt = 0, gSai = 0;
+      gitems.forEach(l => { gEnt += Number(l.entrada)||0; gSai += Number(l.saida)||0; });
+      doc.setFontSize(9);
+      doc.setTextColor(22, 163, 74);
+      doc.text('E: ' + fmt(gEnt), 210, y + 2);
+      doc.setTextColor(220, 38, 38);
+      doc.text('S: ' + fmt(gSai), 240, y + 2);
+      
+      y += 14;
+      y = pdfTableAll(doc, gitems, y, true);
+      y += 10;
+    }
+  }
+  
+  // Footer
+  const pgCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pgCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(240, 242, 247);
+    doc.rect(0, 195, 297, 12, 'F');
+    doc.setTextColor(107, 114, 153);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('FinanceFlow Pro — Gerado em ' + new Date().toLocaleString('pt-BR'), 10, 202);
+    doc.text(`Página ${i} de ${pgCount}`, 270, 202);
+  }
+  
+  const filename = `${tipo}_${MONTHS[currentDate.getMonth()]}_${currentDate.getFullYear()}.pdf`;
+  doc.save(filename);
+  showToast('📄 PDF gerado: ' + filename);
+}
+
+function pdfTableAll(doc, items, startY, compact=false) {
+  const head = [['Data','Descrição','Empresa','Centro de Custo','Tipo de Custo','Tipo Mov.','Conta','Entrada','Saída','Saldo Parcial']];
+  let saldo = 0;
+  const body = items.map(l => {
+    const e = Number(l.entrada)||0, s = Number(l.saida)||0;
+    saldo += e - s;
+    return [
+      formatDate(l.data),
+      l.descricao || '-',
+      l.empresa || '-',
+      l.centroCusto || '-',
+      l.tipoCusto || '-',
+      l.tipoMov || '-',
+      (l.conta || '-').substring(0, 20),
+      e > 0 ? fmt(e) : '-',
+      s > 0 ? fmt(s) : '-',
+      fmt(saldo)
+    ];
+  });
+  
+  doc.autoTable({
+    head,
+    body,
+    startY,
+    theme: 'plain',
+    styles: {
+      fontSize: compact ? 7.5 : 8,
+      cellPadding: 2.5,
+      textColor: [61, 68, 102],
+      lineColor: [221, 225, 238],
+      lineWidth: 0.3,
+      fillColor: false,
+      font: 'helvetica',
+      overflow: 'ellipsize'
+    },
+    headStyles: {
+      fillColor: [234, 236, 244],
+      textColor: [107, 114, 153],
+      fontStyle: 'bold',
+      fontSize: 7,
+      halign: 'center'
+    },
+    alternateRowStyles: { fillColor: [248, 249, 253] },
+    columnStyles: {
+      0: { halign: 'center', cellWidth: 18 },
+      7: { halign: 'right', textColor: [22, 163, 74], cellWidth: 25 },
+      8: { halign: 'right', textColor: [220, 38, 38], cellWidth: 25 },
+      9: { halign: 'right', fontStyle: 'bold', textColor: [26, 111, 212], cellWidth: 28 }
+    },
+    willDrawCell: (data) => {
+      if (data.section === 'body' && data.column.index === 9) {
+        const val = parseFloat((data.cell.raw || '').toString().replace(/[^0-9,.-]/g,'').replace(',','.'));
+        if (!isNaN(val)) data.cell.styles.textColor = val >= 0 ? [22, 163, 74] : [220, 38, 38];
+      }
+    }
+  });
+  
+  return doc.lastAutoTable.finalY || startY + 20;
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Enter key on add modal
+document.getElementById('add-field-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveNewCadastro();
+});
+
+// ===================== INIT =====================
+loadDB();
+updateMonthLabel();
+renderDashboard();
+</script>
+</body>
+</html>
