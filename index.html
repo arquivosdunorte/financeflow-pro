@@ -698,6 +698,9 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
 
   <div class="nav-section">
     <div class="nav-label">Sistema</div>
+    <div class="nav-item" onclick="showView('backup');closeSidebar()">
+      <span class="ico">☁️</span> Backup de Dados
+    </div>
     <div class="nav-item" onclick="abrirConfigAcesso();closeSidebar()">
       <span class="ico">🔐</span> Configurar Acesso
     </div>
@@ -884,6 +887,95 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
           </div>
         </div>
       </div>
+    </div>
+
+
+    <!-- BACKUP -->
+    <div id="view-backup" class="view">
+
+      <!-- Cards de status -->
+      <div class="summary-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="summary-card c-blue">
+          <div class="label">Total de Lançamentos</div>
+          <div class="value acc" id="bkp-total-lanc">0</div>
+          <div class="sub">Registros salvos</div>
+        </div>
+        <div class="summary-card c-green">
+          <div class="label">Último Backup</div>
+          <div class="value" id="bkp-ultimo" style="font-size:14px;color:var(--text2)">Nunca realizado</div>
+          <div class="sub">Data do último export</div>
+        </div>
+        <div class="summary-card c-amber">
+          <div class="label">Tamanho dos Dados</div>
+          <div class="value" id="bkp-tamanho" style="color:var(--amber)">0 KB</div>
+          <div class="sub">Armazenado localmente</div>
+        </div>
+      </div>
+
+      <!-- Exportar -->
+      <div class="table-card" style="margin-bottom:20px">
+        <div class="table-toolbar">
+          <h3>⬆️ Exportar Backup</h3>
+        </div>
+        <div style="padding:24px 20px">
+          <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+            Gera um arquivo <strong>.json</strong> com <strong>todos os dados do sistema</strong>: lançamentos, cadastros (contas, empresas, tipos, centros de custo) e configurações. Salve este arquivo em um local seguro como Google Drive, OneDrive ou Dropbox.
+          </p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" style="font-size:14px;padding:10px 22px" onclick="exportarBackup()">
+              ⬇️ Baixar Backup Completo (.json)
+            </button>
+            <button class="btn btn-ghost" style="font-size:14px;padding:10px 22px" onclick="exportCSV()">
+              📊 Exportar Lançamentos (.csv)
+            </button>
+          </div>
+          <div style="margin-top:18px;padding:14px 16px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
+            <p style="font-size:12px;color:var(--text3);line-height:1.7">
+              💡 <strong>Dica:</strong> Salve o backup no <strong>Google Drive</strong> ou <strong>OneDrive</strong> para ter acesso de qualquer lugar.<br>
+              🔁 <strong>Recomendação:</strong> Faça backup pelo menos <strong>uma vez por semana</strong> ou sempre após lançamentos importantes.<br>
+              🔒 O arquivo contém dados financeiros — mantenha-o em local seguro e de acesso restrito.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Importar -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3>⬆️ Importar Backup</h3>
+        </div>
+        <div style="padding:24px 20px">
+          <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+            Restaura os dados a partir de um arquivo de backup <strong>.json</strong> gerado por este sistema. Você pode escolher entre <strong>substituir todos os dados</strong> ou <strong>mesclar</strong> com os dados existentes (apenas novos lançamentos serão adicionados).
+          </p>
+
+          <div style="border:2px dashed var(--border2);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface2)"
+               id="drop-zone"
+               onclick="document.getElementById('input-backup').click()"
+               ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(26,111,212,0.05)'"
+               ondragleave="this.style.borderColor='var(--border2)';this.style.background='var(--surface2)'"
+               ondrop="handleDrop(event)">
+            <div style="font-size:36px;margin-bottom:10px">📂</div>
+            <p style="font-size:14px;font-weight:600;color:var(--text2)">Clique para selecionar ou arraste o arquivo aqui</p>
+            <p style="font-size:12px;color:var(--text3);margin-top:4px">Apenas arquivos .json gerados por este sistema</p>
+          </div>
+          <input type="file" id="input-backup" accept=".json" style="display:none" onchange="lerArquivoBackup(event)">
+
+          <div id="bkp-preview" style="display:none;margin-top:18px;padding:16px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
+            <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">📋 Prévia do arquivo:</p>
+            <div id="bkp-preview-info" style="font-size:13px;color:var(--text2);line-height:1.8"></div>
+            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-red" onclick="importarBackup('substituir')">🔄 Substituir todos os dados</button>
+              <button class="btn btn-green" onclick="importarBackup('mesclar')">➕ Mesclar (adicionar novos)</button>
+              <button class="btn btn-ghost" onclick="cancelarImport()">✕ Cancelar</button>
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:10px">⚠️ <strong>Substituir</strong> apaga todos os dados atuais. <strong>Mesclar</strong> mantém os existentes e adiciona apenas lançamentos novos.</p>
+          </div>
+
+          <div id="bkp-erro" class="login-error" style="margin-top:14px"></div>
+        </div>
+      </div>
+
     </div>
 
   </div><!-- /content -->
@@ -1240,6 +1332,7 @@ function showView(v) {
   if (v === 'dashboard') renderDashboard();
   if (v === 'lancamentos') { renderLancamentos(); document.getElementById('search-lanc').value=''; }
   if (v === 'cadastros') renderCadastros();
+  if (v === 'backup') renderBackup();
 }
 
 // ===================== MONTH NAV =====================
@@ -1754,6 +1847,135 @@ function gerarRelatorioSintetico() {
   doc.save('sintetico_' + MONTHS[currentDate.getMonth()] + '_' + currentDate.getFullYear() + '.pdf');
   showToast('📊 Relatório Sintético gerado!');
 }
+
+// ===================== BACKUP =====================
+let dadosBackupPendente = null;
+
+function renderBackup() {
+  const total = db.lancamentos.length;
+  document.getElementById('bkp-total-lanc').textContent = total;
+  const tamanho = new Blob([localStorage.getItem('financeflow_db')||'']).size;
+  document.getElementById('bkp-tamanho').textContent = tamanho < 1024
+    ? tamanho + ' B'
+    : (tamanho/1024).toFixed(1) + ' KB';
+  const ultimo = localStorage.getItem('ff_ultimo_backup');
+  document.getElementById('bkp-ultimo').textContent = ultimo
+    ? new Date(parseInt(ultimo)).toLocaleString('pt-BR')
+    : 'Nunca realizado';
+}
+
+function exportarBackup() {
+  const backup = {
+    versao: '1.0',
+    sistema: 'FinanceFlow Pro',
+    dataExport: new Date().toISOString(),
+    dados: db
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const agora = new Date();
+  const nome = 'backup_financeflow_' +
+    agora.getFullYear() + '-' +
+    String(agora.getMonth()+1).padStart(2,'0') + '-' +
+    String(agora.getDate()).padStart(2,'0') + '.json';
+  a.href = url; a.download = nome; a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('ff_ultimo_backup', Date.now().toString());
+  renderBackup();
+  showToast('✅ Backup exportado: ' + nome);
+}
+
+function lerArquivoBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  processarArquivoBackup(file);
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('drop-zone').style.borderColor = 'var(--border2)';
+  document.getElementById('drop-zone').style.background = 'var(--surface2)';
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  processarArquivoBackup(file);
+}
+
+function processarArquivoBackup(file) {
+  const erroEl = document.getElementById('bkp-erro');
+  erroEl.classList.remove('show');
+  if (!file.name.endsWith('.json')) {
+    erroEl.textContent = '❌ Arquivo inválido. Selecione um arquivo .json gerado por este sistema.';
+    erroEl.classList.add('show'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.dados || !parsed.sistema) {
+        erroEl.textContent = '❌ Arquivo não reconhecido. Use apenas backups gerados por este sistema.';
+        erroEl.classList.add('show'); return;
+      }
+      dadosBackupPendente = parsed;
+      const d = parsed.dados;
+      const dataExp = parsed.dataExport
+        ? new Date(parsed.dataExport).toLocaleString('pt-BR')
+        : 'Desconhecida';
+      document.getElementById('bkp-preview-info').innerHTML =
+        '<b>📅 Data do backup:</b> ' + dataExp + '<br>' +
+        '<b>💳 Lançamentos:</b> ' + (d.lancamentos||[]).length + ' registros<br>' +
+        '<b>🏦 Contas bancárias:</b> ' + (d.contas||[]).length + ' itens<br>' +
+        '<b>🏢 Empresas:</b> ' + (d.empresas||[]).length + ' itens<br>' +
+        '<b>🏷️ Tipos de custo:</b> ' + (d.tipoCusto||[]).length + ' itens<br>' +
+        '<b>📁 Centros de custo:</b> ' + (d.centroCusto||[]).length + ' itens<br>' +
+        '<b>🔄 Tipos de movimentação:</b> ' + (d.tipoMov||[]).length + ' itens';
+      document.getElementById('bkp-preview').style.display = 'block';
+    } catch(err) {
+      erroEl.textContent = '❌ Erro ao ler o arquivo. Verifique se não está corrompido.';
+      erroEl.classList.add('show');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importarBackup(modo) {
+  if (!dadosBackupPendente) return;
+  const d = dadosBackupPendente.dados;
+
+  if (modo === 'substituir') {
+    if (!confirm('⚠️ ATENÇÃO: Isso vai apagar TODOS os dados atuais e substituir pelos do backup. Confirma?')) return;
+    if (Array.isArray(d.contas))       db.contas       = d.contas;
+    if (Array.isArray(d.empresas))     db.empresas     = d.empresas;
+    if (Array.isArray(d.tipoCusto))    db.tipoCusto    = d.tipoCusto;
+    if (Array.isArray(d.centroCusto))  db.centroCusto  = d.centroCusto;
+    if (Array.isArray(d.tipoMov))      db.tipoMov      = d.tipoMov;
+    if (Array.isArray(d.lancamentos))  db.lancamentos  = d.lancamentos;
+    saveDB();
+    showToast('✅ Backup restaurado com sucesso!');
+  } else {
+    // Mesclar: adiciona lançamentos que não existem pelo id
+    const idsExistentes = new Set(db.lancamentos.map(l => l.id));
+    let novos = 0;
+    (d.lancamentos||[]).forEach(l => {
+      if (!idsExistentes.has(l.id)) { db.lancamentos.push(l); novos++; }
+    });
+    saveDB();
+    showToast('✅ Mesclado: ' + novos + ' novo(s) lançamento(s) adicionado(s)!');
+  }
+
+  cancelarImport();
+  renderDashboard();
+  renderBackup();
+}
+
+function cancelarImport() {
+  dadosBackupPendente = null;
+  document.getElementById('bkp-preview').style.display = 'none';
+  document.getElementById('input-backup').value = '';
+  document.getElementById('bkp-erro').classList.remove('show');
+}
+
 // ===================== EVENT LISTENERS =====================
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
