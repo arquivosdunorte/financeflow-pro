@@ -420,100 +420,7 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
 }
 
 
-/* ── LOGIN SCREEN ── */
-#login-screen {
-  position: fixed; inset: 0;
-  background: linear-gradient(135deg, #e8edf8 0%, #f0f2f7 50%, #dce4f5 100%);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 10000; padding: 20px;
-}
-#login-screen.hidden { display: none; }
 
-.login-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px 44px;
-  width: 420px; max-width: 100%;
-  box-shadow: 0 8px 40px rgba(26,111,212,0.13);
-  animation: slideUp 0.3s ease;
-}
-.login-logo {
-  text-align: center; margin-bottom: 28px;
-}
-.login-logo .logo-icon-big {
-  width: 56px; height: 56px;
-  background: var(--accent);
-  border-radius: 14px;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 26px; margin-bottom: 12px;
-}
-.login-logo h1 { font-family: var(--serif); font-size: 26px; color: var(--text); }
-.login-logo h1 span { color: var(--accent); }
-.login-logo p { font-size: 12px; color: var(--text3); margin-top: 3px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-
-.login-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.login-subtitle { font-size: 13px; color: var(--text3); margin-bottom: 22px; }
-
-.login-form { display: flex; flex-direction: column; gap: 14px; }
-.login-form .form-group label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
-.login-form input {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--r2); color: var(--text);
-  padding: 10px 13px; font-size: 14px;
-  font-family: var(--sans); outline: none; width: 100%;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.login-form input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(26,111,212,0.1);
-}
-.login-error {
-  background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2);
-  border-radius: var(--r2); padding: 9px 13px;
-  font-size: 13px; color: var(--red); display: none;
-}
-.login-error.show { display: block; }
-.login-info {
-  background: rgba(26,111,212,0.07); border: 1px solid rgba(26,111,212,0.2);
-  border-radius: var(--r2); padding: 9px 13px;
-  font-size: 13px; color: var(--accent); display: none;
-}
-.login-info.show { display: block; }
-.login-btn {
-  width: 100%; padding: 11px;
-  background: var(--accent); color: #fff;
-  border: none; border-radius: var(--r2);
-  font-size: 15px; font-weight: 700;
-  font-family: var(--sans); cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  margin-top: 4px;
-}
-.login-btn:hover { background: var(--accent2); }
-.login-btn:active { transform: scale(0.98); }
-.login-link {
-  text-align: center; margin-top: 14px;
-  font-size: 13px; color: var(--text3);
-}
-.login-link a {
-  color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer;
-}
-.login-link a:hover { text-decoration: underline; }
-.login-attempts {
-  text-align: center; font-size: 12px; color: var(--text3); margin-top: 6px;
-}
-.login-divider {
-  border: none; border-top: 1px solid var(--border); margin: 18px 0;
-}
-
-/* Painel de config de senha (dentro do sidebar) */
-.config-section {
-  margin: 10px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 10px 14px;
-}
 .config-section p { font-size: 12px; color: var(--text3); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
 
 /* ── PRINT ── */
@@ -528,117 +435,7 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
 <body>
 
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="logo-icon-big">💹</div>
-      <h1>Finance<span>Flow</span></h1>
-      <p>Gestão Financeira Pro</p>
-    </div>
 
-    <!-- PAINEL: Login -->
-    <div id="panel-login">
-      <div class="login-title">Acesso ao Sistema</div>
-      <div class="login-subtitle">Digite sua senha administrativa para continuar.</div>
-      <div class="login-form">
-        <div class="form-group">
-          <label>Senha</label>
-          <input type="password" id="login-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
-        </div>
-        <div class="login-error" id="login-erro"></div>
-        <button class="login-btn" onclick="fazerLogin()">🔐 Entrar</button>
-        <div class="login-attempts" id="login-tentativas"></div>
-      </div>
-      <div class="login-link">
-        <a onclick="mostrarPainel('recuperar')">Esqueci minha senha</a>
-      </div>
-    </div>
-
-    <!-- PAINEL: Recuperar senha -->
-    <div id="panel-recuperar" style="display:none">
-      <div class="login-title">Recuperar Senha</div>
-      <div class="login-subtitle">Informe o e-mail cadastrado. Será exibido um código de redefinição.</div>
-      <div class="login-form">
-        <div class="form-group">
-          <label>E-mail cadastrado</label>
-          <input type="email" id="rec-email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')enviarRecuperacao()">
-        </div>
-        <div class="login-error" id="rec-erro"></div>
-        <div class="login-info" id="rec-info"></div>
-        <button class="login-btn" onclick="enviarRecuperacao()">📧 Enviar Código</button>
-      </div>
-      <div class="login-link">
-        <a onclick="mostrarPainel('login')">← Voltar ao login</a>
-      </div>
-    </div>
-
-    <!-- PAINEL: Redefinir senha com código -->
-    <div id="panel-redef" style="display:none">
-      <div class="login-title">Redefinir Senha</div>
-      <div class="login-subtitle">Digite o código recebido e escolha uma nova senha.</div>
-      <div class="login-form">
-        <div class="form-group">
-          <label>Código de verificação</label>
-          <input type="text" id="redef-codigo" placeholder="000000" maxlength="6" style="letter-spacing:0.2em;font-size:18px;text-align:center">
-        </div>
-        <div class="form-group">
-          <label>Nova Senha</label>
-          <input type="password" id="redef-nova" placeholder="Mínimo 6 caracteres">
-        </div>
-        <div class="form-group">
-          <label>Confirmar Nova Senha</label>
-          <input type="password" id="redef-conf" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')redefinirSenha()">
-        </div>
-        <div class="login-error" id="redef-erro"></div>
-        <div class="login-info" id="redef-info"></div>
-        <button class="login-btn" onclick="redefinirSenha()">✅ Redefinir Senha</button>
-      </div>
-      <div class="login-link">
-        <a onclick="mostrarPainel('login')">← Voltar ao login</a>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- MODAL: Configurações de Acesso -->
-<div class="modal-overlay" id="modal-config-acesso" role="dialog" aria-modal="true">
-  <div class="modal" style="width:460px">
-    <div class="modal-header">
-      <h3>🔐 Configurações de Acesso</h3>
-      <button class="modal-close" onclick="closeModal('modal-config-acesso')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid" style="grid-template-columns:1fr">
-        <div class="form-group">
-          <label>Senha Atual</label>
-          <input type="password" id="cfg-senha-atual" placeholder="Digite a senha atual">
-        </div>
-        <hr class="login-divider">
-        <div class="form-group">
-          <label>Nova Senha</label>
-          <input type="password" id="cfg-nova-senha" placeholder="Mínimo 6 caracteres">
-        </div>
-        <div class="form-group">
-          <label>Confirmar Nova Senha</label>
-          <input type="password" id="cfg-conf-senha" placeholder="Repita a nova senha">
-        </div>
-        <hr class="login-divider">
-        <div class="form-group">
-          <label>E-mail para Recuperação</label>
-          <input type="email" id="cfg-email" placeholder="seu@email.com">
-        </div>
-        <div class="login-error" id="cfg-erro"></div>
-        <div class="login-info" id="cfg-info"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-config-acesso')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarConfigAcesso()">💾 Salvar Configurações</button>
-    </div>
-  </div>
-</div>
 
 <!-- Page Loader -->
 <div id="page-loader">
@@ -700,12 +497,6 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
     <div class="nav-label">Sistema</div>
     <div class="nav-item" onclick="showView('backup');closeSidebar()">
       <span class="ico">☁️</span> Backup de Dados
-    </div>
-    <div class="nav-item" onclick="abrirConfigAcesso();closeSidebar()">
-      <span class="ico">🔐</span> Configurar Acesso
-    </div>
-    <div class="nav-item" onclick="fazerLogout()">
-      <span class="ico">🚪</span> Sair
     </div>
   </div>
 
@@ -1059,198 +850,6 @@ td.td-saldo { color: var(--accent); font-weight: 700; white-space: nowrap; }
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-
-// ===================== AUTENTICAÇÃO =====================
-const AUTH_KEY = 'ff_auth';
-const DEFAULT_PASS = 'admin123';
-const MAX_TENTATIVAS = 5;
-const BLOQUEIO_MS = 5 * 60 * 1000; // 5 minutos
-
-function getAuth() {
-  try {
-    const a = localStorage.getItem(AUTH_KEY);
-    return a ? JSON.parse(a) : {};
-  } catch(e) { return {}; }
-}
-function saveAuth(obj) {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
-}
-
-function initAuth() {
-  const a = getAuth();
-  if (!a.senha) {
-    saveAuth({ senha: DEFAULT_PASS, email: '', tentativas: 0, bloqueadoAte: 0, codigo: '', codigoExp: 0 });
-  }
-}
-
-function mostrarPainel(p) {
-  ['panel-login','panel-recuperar','panel-redef'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
-  document.getElementById('panel-' + p).style.display = 'block';
-  // limpar campos e erros
-  ['login-erro','rec-erro','rec-info','redef-erro','redef-info'].forEach(id => {
-    const el = document.getElementById(id);
-    el.classList.remove('show'); el.textContent = '';
-  });
-  if (p === 'login') document.getElementById('login-senha').focus();
-  if (p === 'recuperar') document.getElementById('rec-email').focus();
-  if (p === 'redef') document.getElementById('redef-codigo').focus();
-}
-
-function fazerLogin() {
-  const a = getAuth();
-  const agora = Date.now();
-  const erroEl = document.getElementById('login-erro');
-  const tentEl = document.getElementById('login-tentativas');
-
-  // Verificar bloqueio
-  if (a.bloqueadoAte && agora < a.bloqueadoAte) {
-    const restSeg = Math.ceil((a.bloqueadoAte - agora) / 1000);
-    const min = Math.floor(restSeg/60), seg = restSeg%60;
-    erroEl.textContent = `Conta bloqueada. Aguarde ${min}m ${seg}s para tentar novamente.`;
-    erroEl.classList.add('show'); return;
-  }
-
-  const senha = document.getElementById('login-senha').value;
-  if (!senha) { erroEl.textContent = 'Digite a senha.'; erroEl.classList.add('show'); return; }
-
-  if (senha === a.senha) {
-    // Login OK
-    a.tentativas = 0; a.bloqueadoAte = 0;
-    saveAuth(a);
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('login-senha').value = '';
-    erroEl.classList.remove('show');
-    tentEl.textContent = '';
-  } else {
-    a.tentativas = (a.tentativas || 0) + 1;
-    const restantes = MAX_TENTATIVAS - a.tentativas;
-    if (a.tentativas >= MAX_TENTATIVAS) {
-      a.bloqueadoAte = agora + BLOQUEIO_MS;
-      a.tentativas = 0;
-      saveAuth(a);
-      erroEl.textContent = 'Muitas tentativas incorretas. Conta bloqueada por 5 minutos.';
-      tentEl.textContent = '';
-    } else {
-      saveAuth(a);
-      erroEl.textContent = 'Senha incorreta.';
-      tentEl.textContent = `Tentativas restantes: ${restantes}`;
-    }
-    erroEl.classList.add('show');
-    document.getElementById('login-senha').value = '';
-    document.getElementById('login-senha').focus();
-  }
-}
-
-function enviarRecuperacao() {
-  const a = getAuth();
-  const email = document.getElementById('rec-email').value.trim().toLowerCase();
-  const erroEl = document.getElementById('rec-erro');
-  const infoEl = document.getElementById('rec-info');
-  erroEl.classList.remove('show'); infoEl.classList.remove('show');
-
-  if (!email) { erroEl.textContent = 'Digite o e-mail.'; erroEl.classList.add('show'); return; }
-
-  const emailCad = (a.email||'').toLowerCase();
-  if (!emailCad) {
-    erroEl.textContent = 'Nenhum e-mail cadastrado no sistema. Contate o administrador.';
-    erroEl.classList.add('show'); return;
-  }
-  if (email !== emailCad) {
-    erroEl.textContent = 'E-mail não encontrado no sistema.';
-    erroEl.classList.add('show'); return;
-  }
-
-  // Gerar código de 6 dígitos
-  const codigo = String(Math.floor(100000 + Math.random() * 900000));
-  a.codigo = codigo;
-  a.codigoExp = Date.now() + 15 * 60 * 1000; // 15 minutos
-  saveAuth(a);
-
-  // Como é sistema local/web sem backend, exibimos o código na tela
-  infoEl.innerHTML = `✅ Código gerado com sucesso!<br><br>
-    <strong style="font-size:22px;letter-spacing:0.15em">${codigo}</strong><br><br>
-    <span style="font-size:11px">⚠️ Em um sistema real este código seria enviado para <strong>${email}</strong>.<br>
-    O código expira em 15 minutos.</span>`;
-  infoEl.classList.add('show');
-
-  setTimeout(() => mostrarPainel('redef'), 2000);
-}
-
-function redefinirSenha() {
-  const a = getAuth();
-  const codigo = document.getElementById('redef-codigo').value.trim();
-  const nova = document.getElementById('redef-nova').value;
-  const conf = document.getElementById('redef-conf').value;
-  const erroEl = document.getElementById('redef-erro');
-  const infoEl = document.getElementById('redef-info');
-  erroEl.classList.remove('show'); infoEl.classList.remove('show');
-
-  if (!codigo) { erroEl.textContent = 'Digite o código de verificação.'; erroEl.classList.add('show'); return; }
-  if (Date.now() > (a.codigoExp||0)) { erroEl.textContent = 'Código expirado. Solicite um novo.'; erroEl.classList.add('show'); return; }
-  if (codigo !== a.codigo) { erroEl.textContent = 'Código inválido.'; erroEl.classList.add('show'); return; }
-  if (!nova || nova.length < 6) { erroEl.textContent = 'A nova senha deve ter no mínimo 6 caracteres.'; erroEl.classList.add('show'); return; }
-  if (nova !== conf) { erroEl.textContent = 'As senhas não coincidem.'; erroEl.classList.add('show'); return; }
-
-  a.senha = nova; a.codigo = ''; a.codigoExp = 0; a.tentativas = 0; a.bloqueadoAte = 0;
-  saveAuth(a);
-
-  infoEl.textContent = '✅ Senha redefinida com sucesso! Redirecionando...';
-  infoEl.classList.add('show');
-  setTimeout(() => mostrarPainel('login'), 2000);
-}
-
-function fazerLogout() {
-  if (!confirm('Deseja sair do sistema?')) return;
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('login-senha').value = '';
-  mostrarPainel('login');
-}
-
-function abrirConfigAcesso() {
-  const a = getAuth();
-  document.getElementById('cfg-email').value = a.email || '';
-  document.getElementById('cfg-senha-atual').value = '';
-  document.getElementById('cfg-nova-senha').value = '';
-  document.getElementById('cfg-conf-senha').value = '';
-  document.getElementById('cfg-erro').classList.remove('show');
-  document.getElementById('cfg-info').classList.remove('show');
-  document.getElementById('modal-config-acesso').classList.add('open');
-}
-
-function salvarConfigAcesso() {
-  const a = getAuth();
-  const senhaAtual = document.getElementById('cfg-senha-atual').value;
-  const novaSenha = document.getElementById('cfg-nova-senha').value;
-  const confSenha = document.getElementById('cfg-conf-senha').value;
-  const email = document.getElementById('cfg-email').value.trim();
-  const erroEl = document.getElementById('cfg-erro');
-  const infoEl = document.getElementById('cfg-info');
-  erroEl.classList.remove('show'); infoEl.classList.remove('show');
-
-  // Validar senha atual
-  if (!senhaAtual) { erroEl.textContent = 'Digite a senha atual para confirmar.'; erroEl.classList.add('show'); return; }
-  if (senhaAtual !== a.senha) { erroEl.textContent = 'Senha atual incorreta.'; erroEl.classList.add('show'); return; }
-
-  // Validar nova senha se fornecida
-  if (novaSenha || confSenha) {
-    if (novaSenha.length < 6) { erroEl.textContent = 'A nova senha deve ter no mínimo 6 caracteres.'; erroEl.classList.add('show'); return; }
-    if (novaSenha !== confSenha) { erroEl.textContent = 'As novas senhas não coincidem.'; erroEl.classList.add('show'); return; }
-    a.senha = novaSenha;
-  }
-
-  // Validar e-mail
-  if (email && !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-    erroEl.textContent = 'E-mail inválido.'; erroEl.classList.add('show'); return;
-  }
-  a.email = email;
-  saveAuth(a);
-
-  infoEl.textContent = '✅ Configurações salvas com sucesso!';
-  infoEl.classList.add('show');
-  setTimeout(() => closeModal('modal-config-acesso'), 1800);
-}
 
 // ===================== STATE =====================
 let currentCadastroType = '';
@@ -1989,7 +1588,6 @@ document.addEventListener('keydown', e => {
 
 // ===================== INIT =====================
 document.getElementById('footer-year').textContent = new Date().getFullYear();
-initAuth();
 loadDB();
 updateMonthLabel();
 renderDashboard();
@@ -2001,9 +1599,7 @@ window.addEventListener('load', () => {
     loader.style.opacity = '0';
     setTimeout(() => {
       loader.style.display = 'none';
-      // Mostrar tela de login
-      mostrarPainel('login');
-      document.getElementById('login-senha').focus();
+
     }, 400);
   }, 700);
 });
